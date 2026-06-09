@@ -1,86 +1,65 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import create_engine
 
-from config import cadena_base_datos
-
-engine = create_engine(cadena_base_datos)
-
+engine = create_engine('sqlite:///../bd/base.db')
 Base = declarative_base()
 
 class Pais(Base):
     __tablename__ = 'pais'
-    id         = Column(Integer, primary_key=True, autoincrement=True)
-    nombre     = Column(String(100), unique=True, nullable=False)
-    continente = Column(String(100), nullable=False)
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    continente = Column(String)
 
-    plataformas = relationship('Plataforma', back_populates='pais')
-    series      = relationship('Serie',      back_populates='pais')
-    actores     = relationship('Actor',      back_populates='pais')
-
-    def __repr__(self):
-        return f"Pais: {self.nombre}"
-
+    plataformas = relationship("Plataforma", back_populates="pais")
+    series = relationship("Serie", back_populates="pais")
+    actores = relationship("Actor", back_populates="pais")
 
 class Plataforma(Base):
     __tablename__ = 'plataforma'
-    id                    = Column(Integer, primary_key=True, autoincrement=True)
-    nombre                = Column(String(100), unique=True, nullable=False)
-    pais_id               = Column(Integer, ForeignKey('pais.id'), nullable=True)
-    suscriptores_millones = Column(Integer)
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    pais_id = Column(Integer, ForeignKey('pais.id'))
+    suscriptores_millones = Column(Float)
 
-    pais   = relationship('Pais',  back_populates='plataformas')
-    series = relationship('Serie', back_populates='plataforma')
-
-    def __repr__(self):
-        return f"Plataforma: {self.nombre}"
-
+    pais = relationship("Pais", back_populates="plataformas")
+    series = relationship("Serie", back_populates="plataforma")
 
 class Serie(Base):
     __tablename__ = 'serie'
-    id            = Column(Integer, primary_key=True, autoincrement=True)
-    titulo        = Column(String(200), nullable=False)
-    genero        = Column(String(100))
-    anio_estreno  = Column(Integer)
-    temporadas    = Column(Integer)
+    id = Column(Integer, primary_key=True)
+    titulo = Column(String, nullable=False)
+    genero = Column(String)
+    anio_estreno = Column(Integer)
+    temporadas = Column(Integer)
     plataforma_id = Column(Integer, ForeignKey('plataforma.id'))
-    pais_id       = Column(Integer, ForeignKey('pais.id'))
+    pais_id = Column(Integer, ForeignKey('pais.id'))
 
-    plataforma = relationship('Plataforma', back_populates='series')
-    pais       = relationship('Pais',       back_populates='series')
-    actores    = relationship('Actor',      back_populates='serie')
-    premios    = relationship('Premio',     back_populates='serie')
-
-    def __repr__(self):
-        return f"Serie: {self.nombre}"
+    plataforma = relationship("Plataforma", back_populates="series")
+    pais = relationship("Pais", back_populates="series")
+    actores = relationship("Actor", back_populates="serie")
+    premios = relationship("Premio", back_populates="serie")
 
 class Actor(Base):
     __tablename__ = 'actor'
-    id       = Column(Integer, primary_key=True, autoincrement=True)
-    nombre   = Column(String(200), nullable=False)
-    edad     = Column(Integer)
-    rol      = Column(String(100))
-    pais_id  = Column(Integer, ForeignKey('pais.id'))
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    edad = Column(Integer)
+    rol = Column(String)
+    pais_id = Column(Integer, ForeignKey('pais.id'))
     serie_id = Column(Integer, ForeignKey('serie.id'))
 
-    pais  = relationship('Pais',  back_populates='actores')
-    serie = relationship('Serie', back_populates='actores')
-
-    def __repr__(self):
-        return f"Actor: {self.nombre}"
-
+    pais = relationship("Pais", back_populates="actores")
+    serie = relationship("Serie", back_populates="actores")
 
 class Premio(Base):
     __tablename__ = 'premio'
-    id            = Column(Integer, primary_key=True, autoincrement=True)
-    nombre_premio = Column(String(200), nullable=False)
-    categoria     = Column(String(100))
-    anio          = Column(Integer)
-    serie_id      = Column(Integer, ForeignKey('serie.id'))
+    id = Column(Integer, primary_key=True)
+    nombre_premio = Column(String, nullable=False)
+    categoria = Column(String)
+    anio = Column(Integer)
+    serie_id = Column(Integer, ForeignKey('serie.id'))
 
-    serie = relationship('Serie', back_populates='premios')
-
-    def __repr__(self):
-        return f"Premio: {self.nombre_premio}"
+    serie = relationship("Serie", back_populates="premios")
 
 Base.metadata.create_all(engine)
