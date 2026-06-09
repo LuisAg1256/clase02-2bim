@@ -39,6 +39,18 @@ class Serie(Base):
     pais = relationship("Pais", back_populates="series")
     actores = relationship("Actor", back_populates="serie")
     premios = relationship("Premio", back_populates="serie")
+    
+    def obtener_edad_actores(self):
+        edades = [e.edad for e in self.actores]
+        if len(edades) > 0:
+            suma = sum(edades)
+            promedio = suma / len(edades)
+            return promedio
+        else:
+            return 0
+
+    def obtener_cantidad_premios(self):
+        return len(self.premios)
 
 class Actor(Base):
     __tablename__ = 'actor'
