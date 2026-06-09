@@ -14,10 +14,15 @@ for r in resultados:
     print(f"Serie: {r.titulo} | Promedio de edad: {promedio}")
     print("-" * 54)
 
-
-print("--- Usando el método de clase ---")
+print("--- Usando el método de clase consulta solo titulo y promedios---")
 resultados1 = session.query(Serie).all()
 for serie in resultados1:
+    promedio = serie.obtener_edad_actores()
+    print(f"Serie: {serie.titulo} | Promedio (con método): {promedio:.2f}")
+
+print("--- Usando el método de clase consulta con premios---")
+resultados2 = session.query(Serie).all()
+for serie in resultados2:
     promedio = serie.obtener_edad_actores()
     cantidad_premios = serie.obtener_cantidad_premios()
     print(f"Serie: {serie.titulo} | Promedio (con método): {promedio:.2f} | Premios: {cantidad_premios}")
